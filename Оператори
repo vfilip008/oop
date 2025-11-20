@@ -1,0 +1,127 @@
+#include <bits/stdc++.h>
+using namespace std;
+int gcd(int a,int b)
+{
+   if(b==0)
+   {
+       return a;
+   }
+   if(a<b){swap(a,b);}
+   return gcd(b,a%b);
+}
+class Frac {
+    int n;
+    int d;
+public:
+    int N () const { return this->n; }
+    int D () const { return this->d; }
+    void setN(int x) { this->n = x; }
+    void setD(int x) { this->d = x; }
+
+    Frac(const int n, const int d=1) {
+        this->n = n;
+        this->d = d;
+    }
+
+    Frac (const Frac& orig) {
+        this->n = orig.n;
+        this->d = orig.d;
+    }
+
+    Frac& operator=(const Frac& orig) {
+        if (this!=&orig) {
+            this->n = orig.n;
+            this->d = orig.d;
+        }
+        return *this;
+    }
+
+
+
+    void print() {
+        cout<<this->n <<"/" << this->d;
+    }
+
+    Frac operator+(const Frac& k) const {
+        int n = this->N() * k.D() + k.N() * this->D();
+        int d = this->D() * k.D();
+        int g = gcd(n,d);
+        n /= g;
+        d /= g;
+        return Frac(n,d);
+    }
+    Frac operator-(const Frac& k) const {
+        int n = this->N() * k.D() - k.N() * this->D();
+        int d = this->D() * k.D();
+        int g = gcd(n,d);
+        n /= g;
+        d /= g;
+        return Frac(n,d);
+    }
+    Frac operator*(const Frac& b) const {
+        Frac c(*this);
+        c.setN(this->N() * b.N());
+        c.setD(this->D() * b.D());
+        return c;
+    }
+
+    Frac operator/(const Frac& b) const {
+        int x = (this->N() * b.D());
+        int y = (this->D() * b.N());
+        int z = gcd(x,y);
+        x/=z;
+        y/=z;
+        return Frac(x,y);
+    }
+    bool operator==(const Frac& b) const {
+        if((this->N() * b.D()) == (this->D() * b.N()))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    bool operator>(const Frac& b) const {
+    if((this->N() * b.D()) > (this->D() * b.N()))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+     bool operator<(const Frac& b) const {
+    if((this->N() * b.D()) < (this->D() * b.N()))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    ~Frac() {}
+
+};
+
+ostream& operator<<(ostream& o, const Frac& f) {
+    o<<f.N() <<"/" << f.D();
+    return o;
+}
+
+int main() {
+    Frac a(2,3);
+    Frac b(4,6);
+    Frac c(1);
+    Frac d(6,7);
+    Frac e(4,5);
+    cout<<(d+e);
+
+
+
+}
