@@ -1,0 +1,185 @@
+#include <iostream>
+using namespace std;
+class MyVec {
+private:
+    int size;
+    int capacity;
+    int *elements;
+public:
+    MyVec(int size, int value=0)
+    {
+    int capacity = 4;
+    while (size >= capacity) {
+        capacity*=2;
+    }
+    elements = new int[capacity];
+    this->capacity = capacity;
+    this->size = size;
+
+    for (int i=0; i<this->size;i++ ) {
+        elements[i] = value;
+    }
+    //std::cout<<"Constructing finished";
+    }
+
+~MyVec() {
+    delete [] elements;
+    //std::cout<<"Destruction Finished";
+}
+
+void _copy(const MyVec& orig) {
+    this->capacity = orig.capacity;
+    this->size = orig.size;
+    this->elements = new int[this->capacity];
+    for (int i=0; i<this->size; i++) {
+        this->elements[i] = orig.elements[i];
+    }
+}
+
+MyVec(const MyVec& orig) {
+    _copy(orig);
+}
+MyVec& operator=(const MyVec& orig) {
+    if (this != &orig) {
+        delete [] this->elements;
+        _copy(orig);
+    }
+    return *this;
+}
+
+void print() {
+    std::cout<<"C: "<< this->capacity << " S: " << this->size <<":\n";
+    for (int i=0; i<this->size; i++) {
+        std::cout<<this->elements[i] << " ";
+    }
+    std::cout<<std::endl;
+}
+
+void push(int val) {
+   if (this->size == this->capacity) {
+        int newcap = this->capacity*2;
+        int *tmp = new int[newcap];
+        for (int i=0; i<this->size; i++) {
+            tmp[i] = this->elements[i];
+        }
+        delete [] elements;
+        elements = tmp;
+        this->capacity = newcap;
+    }
+
+    this->elements[this->size] = val;
+    this->size++;
+}
+void shrink()
+{
+    if(size <= capacity/2 && capacity>4)
+    {
+        int newCap = capacity/2;
+        int *tmp = new int[newCap];
+        for(int i=0;i<size;i++)
+        {
+            tmp[i] = elements[i];
+        }
+        delete[] elements;
+        elements = tmp;
+        capacity = newCap;
+    }
+
+}
+void pop() {
+    if (this->size > 0)
+    {
+        this->size--;
+        shrink();
+    }
+}
+
+int& operator[](int i) {
+    return this->elements[i];
+}
+
+int at(int i)
+{
+    if(i<0 || i>this->size-1)
+    {
+        return 42;
+    }
+    return this->elements[i];
+
+}
+int front()
+{
+    if(this->size > 0)
+    {
+    return this->elements[0];
+    }
+    return 42;
+
+}
+int back()
+{
+    if(this->size > 0)
+    {
+    return this->elements[this->size -1];
+    }
+    return 42;
+
+}
+int* data(){
+    return &this->elements[0];
+}
+MyVec operator+(const MyVec& orig) const
+{
+    MyVec new_vector(orig.size + this->size);
+    for(int i=0;i<this->size;i++)
+    {
+         new_vector.elements[i]= (this->elements[i]);
+    }
+    for(int i=0 ;i<orig.size;i++)
+    {
+         new_vector.elements[i+this->size]=orig.elements[i];
+    }
+    return new_vector;
+
+}
+void sort()
+{
+    for(int i=0;i<this->size;i++)
+    {
+        for(int j=0;j<this->size-1-i;j++)
+        {
+            if(this->elements[j] >this->elements[j+1])
+            {
+            swap(this->elements[j],this->elements[j+1]);
+            }
+        }
+    }
+    return;
+}
+
+};
+
+int main()
+{
+    MyVec v(3, 123);
+    MyVec b(3, 456);
+    v.print();
+
+    v.push(999);
+    v.push(777);
+    v.pop();
+    v.push(777);
+    v.push(333);
+    v.push(122);
+    v.push(10112554);
+
+    v.print();
+    cout<<v[6]<<endl;
+    MyVec c = (v+b);
+    c.print();
+    v.print();
+    v.sort();
+    v.print();
+
+    return 0;
+}
