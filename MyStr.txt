@@ -69,20 +69,9 @@ public:
         return rez;
     }
 
-    MyStr& operator+=(const MyStr& second) {
-        int l1 = this->length();
-        int l2= second.length();
-        int l=l1+l2;
-        char * tmp = new char[l+1];
-        for (int i=0;i<l1;i++) {
-            tmp[i] = this->content[i];
-        }
-        for (int i=0;i<l2;i++) {
-            tmp[i+l1] = second.content[i];
-        }
-        tmp[l]= '\0';
+      MyStr& operator+=(const MyStr& second) {
+        MyStr tmp = *this + second;
         *this = tmp;
-        delete [] tmp;
         return *this;
     }
 
@@ -120,3 +109,4 @@ int main() {
     //std::cout<<s;
     //std::cout<<s2;
 }
+
