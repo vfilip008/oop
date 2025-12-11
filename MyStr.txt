@@ -1,0 +1,122 @@
+#include <iostream>
+#include <cstdint>
+#include <cstring>
+
+class MyStr {
+    char * content;
+    //uint32_t size;
+
+    void _cpy(const MyStr& orig) {
+        this->content = new char[orig.length()+1];
+        const char * s = orig.content;
+        char *p = content;
+        while (*s) {
+            *p = *s;
+            p++;s++;
+        }
+        *p = '\0';
+    }
+public:
+    MyStr(const char * st = "") {
+        this->content = new char[strlen(st)+1];
+        const char * s;
+        char *p;
+        s = st;
+        p = content;
+        while (*s) {
+            *p = *s;
+            p++;s++;
+        }
+        *p = '\0';
+    }
+
+    ~MyStr(){ delete [] this->content; }
+
+    MyStr(const MyStr& orig) {
+        _cpy(orig);
+    }
+
+    MyStr& operator=(const MyStr& orig) {
+        if (this != &orig) {
+            delete [] this->content;
+            _cpy(orig);
+        }
+        return *this;
+    }
+
+    uint32_t length() const {
+        const char* p = this->content;
+        uint32_t len = 0;
+        while (*p){ len++; p++; }
+        return len;
+    }
+
+    MyStr operator+ (const MyStr& second){
+        int l1= this->length();
+        int l2= second.length();
+        int l = l1+l2;
+        MyStr rez;
+        delete [] rez.content;
+        rez.content = new char[l+1];
+        for (int i=0;i< l1;i++) {
+            rez.content[i] = this->content[i];
+        }
+        for (int i=0;i<l2;i++) {
+            rez.content[i + l1] = second.content[i];
+        }
+        rez.content[l] = '\0';
+
+        return rez;
+    }
+
+    MyStr& operator+=(const MyStr& second) {
+        int l1 = this->length();
+        int l2= second.length();
+        int l=l1+l2;
+        char * tmp = new char[l+1];
+        for (int i=0;i<l1;i++) {
+            tmp[i] = this->content[i];
+        }
+        for (int i=0;i<l2;i++) {
+            tmp[i+l1] = second.content[i];
+        }
+        tmp[l]= '\0';
+        *this = tmp;
+        delete [] tmp;
+        return *this;
+    }
+
+    friend std::ostream& operator<<(std::ostream & o, const MyStr& s);
+    friend std::istream& operator>>(std::istream & i, MyStr& s);
+
+};
+
+std::ostream& operator<<(std::ostream & o, const MyStr& s) {
+    o << s.content;
+    return o;
+}
+
+std::istream& operator>>(std::istream & in, MyStr& s) {
+    char buffer[10000];
+    in.getline(buffer, 10000);
+
+    delete [] s.content;
+    s.content = new char[strlen(buffer) + 1];
+    strcpy(s.content, buffer);
+
+    return in;
+}
+
+int main() {
+    //MyStr s("123ABC"), s1 = "Test string";
+    //MyStr s2(s);
+    //s2 = s1;
+    MyStr s,s1;
+    std::cin>>s>>s1;
+    MyStr s2 = s1+s;
+    std::cout<<s2<<std::endl;
+    s2+=s1;
+    std::cout<<s2;
+    //std::cout<<s;
+    //std::cout<<s2;
+}
