@@ -1,0 +1,162 @@
+#include "raylib.h"
+#include "vector"
+#include "string"
+#include "fstream"
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
+int main()
+{
+     InitWindow(1000, 700, "Mini Notepad");
+
+    SetTargetFPS(60);
+
+    // Text storage
+    std::vector<std::string> lines;
+    lines.push_back("");
+
+    // Cursor position
+    int cursorRow = 0;
+    int cursorCol = 0;
+
+    int fontSize = 24;
+    int lineHeight = 32;
+
+    while (!WindowShouldClose())
+    {
+        int key = GetCharPressed();
+
+        while (key > 0)
+        {
+            if (key >= 32 && key <= 125)
+            {
+                lines[cursorRow].insert(cursorCol, 1, (char)key);
+                cursorCol++;
+            }
+
+
+        }
+        if (IsKeyPressed(KEY_BACKSPACE))
+        {
+            if (cursorCol > 0)
+            {
+                lines[cursorRow].erase(cursorCol - 1, 1);
+                cursorCol--;
+            }
+            else if (cursorRow > 0)
+            {
+                int prevLength = lines[cursorRow - 1].size();
+
+                lines[cursorRow - 1] += lines[cursorRow];
+                lines.erase(lines.begin() + cursorRow);
+
+                cursorRow--;
+                cursorCol = prevLength;
+            }
+        }
+
+        if (IsKeyPressed(KEY_ENTER))
+        {
+            std::string remaining =
+                lines[cursorRow].substr(cursorCol);
+
+            lines[cursorRow] =
+                lines[cursorRow].substr(0, cursorCol);
+
+            lines.insert(lines.begin() + cursorRow + 1,
+                         remaining);
+
+            cursorRow++;
+            cursorCol = 0;
+        }
+
+        if (IsKeyPressed(KEY_LEFT))
+        {
+            if (cursorCol > 0)
+            {
+                cursorCol--;
+            }
+            else if (cursorRow > 0)
+            {
+                cursorRow--;
+                cursorCol = lines[cursorRow].size();
+            }
+        }
+
+        if (IsKeyPressed(KEY_RIGHT))
+        {
+            if (cursorCol < lines[cursorRow].size())
+            {
+                cursorCol++;
+            }
+            else if (cursorRow < lines.size() - 1)
+            {
+                cursorRow++;
+                cursorCol = 0;
+            }
+        }
+
+        if (IsKeyPressed(KEY_UP))
+        {
+            if (cursorRow > 0)
+            {
+                cursorRow--;
+
+                if (cursorCol > lines[cursorRow].size())
+                    cursorCol = lines[cursorRow].size();
+            }
+        }
+
+        if (IsKeyPressed(KEY_DOWN))
+        {
+            if (cursorRow < lines.size() - 1)
+            {
+                cursorRow++;
+
+                if (cursorCol > lines[cursorRow].size())
+                    cursorCol = lines[cursorRow].size();
+            }
+        }
+        if (IsKeyDown(KEY_LEFT_CONTROL) &&
+          IsKeyPressed(KEY_S))
+        {
+            std::ofstream file("output.txt");
+
+            for (const auto& line : lines)
+            {
+                file << line << "\n";
+            }
+
+            file.close();
+        }
+
+        BeginDrawing();
+
+        ClearBackground(RAYWHITE);
+
+        for (int i = 0; i < lines.size(); i++)
+        {
+            DrawText(lines[i].c_str(),20,20 + i * lineHeight,fontSize,BLACK);
+        }
+
+        std::string beforeCursor =
+            lines[cursorRow].substr(0, cursorCol);
+
+        int cursorX = 20 + MeasureText(beforeCursor.c_str(), fontSize);
+
+        int cursorY = 20 + cursorRow * lineHeight;
+
+        DrawRectangle(cursorX,cursorY,2,fontSize,BLACK);
+
+
+        DrawRectangle(0, 670, 1000, 30, LIGHTGRAY);
+
+        std::string status ="Row: " + std::to_string(cursorRow + 1) + "   Col: " + std::to_string(cursorCol + 1);
+
+        DrawText(status.c_str(),10,675,20,BLACK);
+
+        EndDrawing();
+    }
+
+    CloseWindow();
+    return 0;
+}
