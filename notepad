@@ -10,7 +10,6 @@ int main()
 
     SetTargetFPS(60);
 
-    // Text storage
     std::vector<std::string> lines;
     lines.push_back("");
 
@@ -32,7 +31,7 @@ int main()
                 lines[cursorRow].insert(cursorCol, 1, (char)key);
                 cursorCol++;
             }
-
+            key = GetCharPressed();
 
         }
         if (IsKeyPressed(KEY_BACKSPACE))
